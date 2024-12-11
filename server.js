@@ -1,19 +1,19 @@
 import express from 'express';
 import path from 'path';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
 import jwt from 'jsonwebtoken';
 import jwksClient from 'jwks-rsa';
 import dotenv from 'dotenv';
 import sqlite3 from 'sqlite3';
 import { open } from 'sqlite';
-
-// Load environment variables from .env file
-dotenv.config();
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 
 // ES Module compatibility for __dirname
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+
+// Load environment variables from .env file
+dotenv.config();
 
 const app = express();
 app.use(express.json());
@@ -76,12 +76,43 @@ const initDb = async () => {
 };
 
 /**
+ * Fetches user details from Privy API
+ * @param {string} userId - The Privy user ID
+ * @returns {Promise<Object>} User details from Privy
+ */
+const appId = process.env.VITE_PRIVY_APP_ID;
+const appSecret = process.env.PRIVY_APP_SECRET;
+async function fetchPrivyUserDetails(userId) {
+    try {
+      const response = await fetch(`https://auth.privy.io/api/v1/users/${userId}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': 'Basic ' + btoa(`${appId}:${appSecret}`),
+          'privy-app-id': appId
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+  
+      const userData = await response.json();
+      return userData;
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+      throw error;
+    }
+}
+
+/**
  * Middleware to verify Privy JWT tokens
  * Checks for Bearer token in Authorization header
  * Verifies token using Privy's public key from JWKS
  */
 const verifyToken = (req, res, next) => {
     const authHeader = req.headers.authorization;
+
+    // Bearer jfievj93kj0rg....
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
         return res.status(401).json({ success: false, message: 'No token provided' });
     }
@@ -97,6 +128,7 @@ const verifyToken = (req, res, next) => {
             return res.status(401).json({ success: false, message: 'Invalid token' });
         }
         req.user = decoded;
+        console.log("req.user", req.user);
         next();
     });
 };
@@ -147,9 +179,12 @@ app.post('/api/verify-user', async (req, res) => {
 app.post('/api/submit-string', verifyToken, async (req, res) => {
     try {
         const { userString } = req.body;
-        const userId = req.user.sub; // Get user ID from verified token
+        const userId = req.user.sub;
 
-        // Log the incoming request data
+        // Still fetch user details for logging purposes
+        const privyUserData = await fetchPrivyUserDetails(userId);
+        console.log("privyUserData", privyUserData);
+
         console.log('\n--- New String Submission ---');
         console.log('User ID:', userId);
         console.log('JWT User Object:', req.user);
@@ -161,27 +196,15 @@ app.post('/api/submit-string', verifyToken, async (req, res) => {
         }
 
         const db = await initDb();
-
-        // Check if user exists
         const existingUser = await db.get('SELECT * FROM users WHERE id = ?', [userId]);
 
         if (existingUser) {
-            // Update existing user
-            console.log('\nUpdating existing user:');
-            console.log('Previous string:', existingUser.user_string);
-            console.log('New string:', userString);
-            
             await db.run(
                 'UPDATE users SET user_string = ?, last_login = CURRENT_TIMESTAMP WHERE id = ?',
                 [userString, userId]
             );
             console.log('User data updated successfully');
         } else {
-            // Create new user
-            console.log('\nCreating new user:');
-            console.log('User ID:', userId);
-            console.log('Initial string:', userString);
-            
             await db.run(
                 'INSERT INTO users (id, user_string) VALUES (?, ?)',
                 [userId, userString]
@@ -189,7 +212,6 @@ app.post('/api/submit-string', verifyToken, async (req, res) => {
             console.log('New user created successfully');
         }
 
-        // Log the final state
         const updatedUser = await db.get('SELECT * FROM users WHERE id = ?', [userId]);
         console.log('\nFinal user state:', updatedUser);
         console.log('--- End String Submission ---\n');

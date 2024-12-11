@@ -54,6 +54,7 @@ function AuthComponent() {
         setIsSubmitting(true);
         try {
             const authToken = await getAccessToken();
+            console.log("Whats my auth token?", authToken);
             const response = await fetch('/api/submit-string', {
                 method: 'POST',
                 headers: {
