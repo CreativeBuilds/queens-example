@@ -1,0 +1,21 @@
+.string-input-window {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.string-input-window input {
+    padding: 8px;
+    font-size: 16px;
+}
+
+.button-container {
+    display: flex;
+    gap: 10px;
+}
+
+.button-container button {
+    padding: 8px 16px;
+    cursor: pointer;
+} 
