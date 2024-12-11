@@ -43,22 +43,27 @@ This example uses SQLite for simplicity. This can be replaced in production with
 ## Example Flow with Screenshots
 
 ### 1. Initial Login Screen
-![Login Screen](example_imgs/1.png)
 *User arrives at the application and sees the login button*
 
+![Login Screen](example_imgs/1.png)
+
 ### 2. Wallet Selection
-![Wallet Selection](example_imgs/2.png)
 *User selects MetaMask as their authentication method*
 
+![Wallet Selection](example_imgs/2.png)
+
 ### 3. Post-Authentication View
-![Authenticated View](example_imgs/3.png)
 *After successful authentication, user sees their random number and user ID*
 
+![Authenticated View](example_imgs/3.png)
+
 ### 4. String Input Window
-![String Input](example_imgs/4.png)
 *User enters a string value in the popup window*
 
+![String Input](example_imgs/4.png)
+
 ### 5. Server Processing
-![Server Logs](example_imgs/5.png)
 *Server logs showing successful string submission and processing*
+
+![Server Logs](example_imgs/5.png)
 
