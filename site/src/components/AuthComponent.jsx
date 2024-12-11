@@ -2,7 +2,7 @@ import { usePrivy } from '@privy-io/react-auth';
 import { useState, useEffect } from 'react';
 
 function AuthComponent() {
-    const { login, ready, authenticated, user, getAccessToken } = usePrivy();
+    const { login, logout, ready, authenticated, user, getAccessToken } = usePrivy();
     const [randomNumber, setRandomNumber] = useState(null);
     const [error, setError] = useState(null);
     const [isVerifying, setIsVerifying] = useState(false);
@@ -112,7 +112,22 @@ function AuthComponent() {
                 <button onClick={login}>Login with Privy</button>
             ) : (
                 <div>
-                    <p>Welcome, {user.id}!</p>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                        <p>Welcome, {user.id}!</p>
+                        <button 
+                            onClick={logout}
+                            style={{
+                                backgroundColor: '#dc3545',
+                                color: 'white',
+                                border: 'none',
+                                padding: '8px 16px',
+                                borderRadius: '4px',
+                                cursor: 'pointer'
+                            }}
+                        >
+                            Logout
+                        </button>
+                    </div>
                     {randomNumber !== null && (
                         <p>Your verified random number: {randomNumber}</p>
                     )}

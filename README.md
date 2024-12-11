@@ -38,3 +38,27 @@ This example uses SQLite for simplicity. This can be replaced in production with
 4. Once authenticated, you should see a random number and your user ID.
 5. Click the "Open String Input Window" and enter a value.
 6. Verify in the DB (or in the server logs) that the value was stored.
+
+
+## Example Flow with Screenshots
+
+### 1. Initial Login Screen
+![Login Screen](example_imgs/1.png)
+*User arrives at the application and sees the login button*
+
+### 2. Wallet Selection
+![Wallet Selection](example_imgs/2.png)
+*User selects MetaMask as their authentication method*
+
+### 3. Post-Authentication View
+![Authenticated View](example_imgs/3.png)
+*After successful authentication, user sees their random number and user ID*
+
+### 4. String Input Window
+![String Input](example_imgs/4.png)
+*User enters a string value in the popup window*
+
+### 5. Server Processing
+![Server Logs](example_imgs/5.png)
+*Server logs showing successful string submission and processing*
+
